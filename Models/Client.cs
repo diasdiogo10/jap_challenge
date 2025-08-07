@@ -9,13 +9,16 @@ namespace JAPChallenge.Models
     public class Client
     {
         public int Id { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Id is required.")]
         public string FullName { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Invalid email format.")]
         public string Email { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Phone is required.")]
+        [DataType(DataType.PhoneNumber)]
+        [RegularExpression(@"^(2\d{8}|9[1236]\d{7})$", ErrorMessage = "Invalid phone number format.")]
         public string Phone { get; set; }
-        [Required]
+        [Required(ErrorMessage = "DrivingLicense is required.")]
         public string DrivingLicense { get; set; }
 
         public ICollection<Contract> Contracts { get; } = new List<Contract>();

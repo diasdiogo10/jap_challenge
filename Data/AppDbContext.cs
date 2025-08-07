@@ -14,10 +14,15 @@ namespace JAPChallenge.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Client>()
+                .HasIndex(c => c.Email)
+                    .IsUnique();
+
+            modelBuilder.Entity<Client>()
                 .HasMany(c => c.Contracts)
                 .WithOne(c => c.Client)
                 .HasForeignKey(c => c.ClientId)
                 .HasPrincipalKey(c => c.Id);
+
 
             modelBuilder.Entity<Vehicle>()
                 .HasMany(v => v.Contracts)

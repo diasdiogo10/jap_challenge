@@ -9,17 +9,18 @@ namespace JAPChallenge.Models
     public class Vehicle
     {
         public int Id { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Brand is required.")]
         public string Brand { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Model is required.")]
         public string Model { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Plate Number is required.")]
         public string PlateNumber { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Manufacture Year is required.")]
+        [RegularExpression(@"^(18|19|20)\d{2}$", ErrorMessage = "Invalid year format.")]
         public int ManufactureYear { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Fuel Type is required.")]
         public string FuelType { get; set; }
-        public bool Status { get; set; }
+        public string Status { get; set; } = "Disponível";
 
         public ICollection<Contract> Contracts { get; } = new List<Contract>();
     }

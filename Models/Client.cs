@@ -9,7 +9,7 @@ namespace JAPChallenge.Models
     public class Client
     {
         public int Id { get; set; }
-        [Required(ErrorMessage = "Id is required.")]
+        [Required(ErrorMessage = "Full Name is required.")]
         public string FullName { get; set; }
         [Required(ErrorMessage = "Email is required.")]
         [EmailAddress(ErrorMessage = "Invalid email format.")]

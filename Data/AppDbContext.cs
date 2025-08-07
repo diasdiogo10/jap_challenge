@@ -23,6 +23,9 @@ namespace JAPChallenge.Data
                 .HasForeignKey(c => c.ClientId)
                 .HasPrincipalKey(c => c.Id);
 
+            modelBuilder.Entity<Vehicle>()
+                .HasIndex(v => v.PlateNumber)
+                    .IsUnique();
 
             modelBuilder.Entity<Vehicle>()
                 .HasMany(v => v.Contracts)

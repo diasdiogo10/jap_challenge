@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using JAPChallenge.Data;
+using JAPChallenge.Dtos;
 using JAPChallenge.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,15 +16,18 @@ namespace JAPChallenge.Controllers
     public class VehiclesController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public VehiclesController(AppDbContext context)
+        public VehiclesController(AppDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddVehicle(Vehicle vehicle)
+        public async Task<IActionResult> AddVehicle(VehicleAddDto vehicleAddDto)
         {
+            var vehicle = _mapper.Map<Vehicle>(vehicleAddDto);
             var PlateNumberExists = await _context.Vehicles.AnyAsync(v => v.PlateNumber == vehicle.PlateNumber);
 
             if (PlateNumberExists)
@@ -42,7 +47,9 @@ namespace JAPChallenge.Controllers
             _context.Vehicles.Add(vehicle);
             await _context.SaveChangesAsync();
 
-            return Ok(vehicle);
+            var vehicleResponse = _mapper.Map<VehicleResponseDto>(vehicle);
+
+            return Ok(vehicleResponse);
         }
 
         [HttpDelete("{id}")]
@@ -58,7 +65,9 @@ namespace JAPChallenge.Controllers
             _context.Vehicles.Remove(existingVehicle);
             await _context.SaveChangesAsync();
 
-            return Ok(existingVehicle);
+            var vehicleResponse = _mapper.Map<VehicleResponseDto>(existingVehicle);
+
+            return Ok(vehicleResponse);
         }
 
         [HttpGet]
@@ -67,12 +76,26 @@ namespace JAPChallenge.Controllers
             var vehicles = await _context.Vehicles.ToListAsync();
             await _context.SaveChangesAsync();
 
-            return Ok(vehicles);
+            var vehicleResponse = _mapper.Map<List<VehicleResponseDto>>(vehicles);
+
+            return Ok(vehicleResponse);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetVehicleById(int id)
+        {
+            var vehicle = await _context.Vehicles.FindAsync(id);
+            await _context.SaveChangesAsync();
+
+            var vehicleResponse = _mapper.Map<VehicleResponseDto>(vehicle);
+
+            return Ok(vehicleResponse);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateVehicle(int id, Vehicle vehicle)
+        public async Task<IActionResult> UpdateVehicle(int id, VehicleAddDto vehicleAddDto)
         {
+            var vehicle = _mapper.Map<Vehicle>(vehicleAddDto);
             var existingVehicle = _context.Vehicles.FirstOrDefault(vehicle => vehicle.Id == id);
 
             if (existingVehicle == null)
@@ -103,7 +126,9 @@ namespace JAPChallenge.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok(existingVehicle);
+            var vehicleResponse = _mapper.Map<VehicleResponseDto>(existingVehicle);
+
+            return Ok(vehicleResponse);
         }
     }
 }

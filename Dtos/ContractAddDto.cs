@@ -4,9 +4,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace JAPChallenge.Models
+namespace JAPChallenge.Dtos
 {
-    public class Contract
+    public class ContractAddDto
     {
         public int Id { get; set; }
         [Required(ErrorMessage = "Start date is required.")]
@@ -21,10 +21,8 @@ namespace JAPChallenge.Models
 
         [Required(ErrorMessage = "Client is required.")]
         public int ClientId { get; set; }
-        public Client Client { get; set; }
 
         [Required(ErrorMessage = "Vehicle is required.")]
         public int VehicleId { get; set; }
-        public Vehicle Vehicle { get; set; }
     }
 }

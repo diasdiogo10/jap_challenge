@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using JAPChallenge.Data;
+using JAPChallenge.Dtos;
 using JAPChallenge.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -15,15 +17,18 @@ namespace JAPChallenge.Controllers
     public class ClientsController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public ClientsController(AppDbContext context)
+        public ClientsController(AppDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddClient(Client client)
+        public async Task<IActionResult> AddClient(ClientDto clientDto)
         {
+            var client = _mapper.Map<Client>(clientDto);
             var emailExists = await _context.Clients
                     .AnyAsync(c => c.Email == client.Email);
 
@@ -51,21 +56,35 @@ namespace JAPChallenge.Controllers
             _context.Clients.Remove(existingClient);
             await _context.SaveChangesAsync();
 
-            return Ok(existingClient);
+            var clientDto = _mapper.Map<ClientDto>(existingClient);
+            return Ok(clientDto);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetClients()
         {
             var clients = await _context.Clients.ToListAsync();
+
+            var clientDtos = _mapper.Map<List<ClientDto>>(clients);
+
+            return Ok(clientDtos);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetClientById(int id)
+        {
+            var client = await _context.Clients.FindAsync(id);
             await _context.SaveChangesAsync();
 
-            return Ok(clients);
+            var clientDto = _mapper.Map<ClientDto>(client);
+
+            return Ok(clientDto);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateClient(int id, Client client)
+        public async Task<IActionResult> UpdateClient(int id, ClientDto clientDto)
         {
+            var client = _mapper.Map<Client>(clientDto);
             var existingClient = _context.Clients.FirstOrDefault(client => client.Id == id);
 
             if (existingClient == null)
@@ -88,7 +107,9 @@ namespace JAPChallenge.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Ok(existingClient);
+            var clientResponse = _mapper.Map<ClientDto>(existingClient);
+
+            return Ok(clientResponse);
         }
     }
 }

@@ -12,5 +12,6 @@ namespace JAPChallenge.Dtos
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public int InitialMileage { get; set; }
+        public decimal Total { get; set; }
     }
 }

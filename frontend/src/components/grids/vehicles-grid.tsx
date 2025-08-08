@@ -125,7 +125,7 @@ export default function VehiclesGrid() {
                   className="w-full"
                   onClick={() => router.push(`/vehicles/${vehicle.id}`)}
                 >
-                  Ver detalhes
+                  Rent
                 </Button>
               </CardFooter>
             </Card>

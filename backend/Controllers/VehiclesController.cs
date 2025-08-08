@@ -62,6 +62,11 @@ namespace JAPChallenge.Controllers
                 return NotFound();
             }
 
+            if (existingVehicle.Status == "Alugado")
+            {
+                return Conflict(new { message = "The vehicle is currently rented and cannot be deleted." });
+            }
+
             _context.Vehicles.Remove(existingVehicle);
             await _context.SaveChangesAsync();
 

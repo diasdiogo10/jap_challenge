@@ -13,6 +13,11 @@ namespace JAPChallenge.Dtos
         public string Brand { get; set; }
         [Required(ErrorMessage = "Model is required.")]
         public string Model { get; set; }
+        [Required(ErrorMessage = "Capacity is required.")]
+        [Range(1, 9, ErrorMessage = "Capacity must be between 1 and 9.")]
+        public int Capacity { get; set; }
+        [Required(ErrorMessage = "Transmission type is required.")]
+        public string TransmissionType { get; set; }
         [Required(ErrorMessage = "Plate Number is required.")]
         public string PlateNumber { get; set; }
         [Required(ErrorMessage = "Manufacture Year is required.")]
@@ -20,5 +25,8 @@ namespace JAPChallenge.Dtos
         public int ManufactureYear { get; set; }
         [Required(ErrorMessage = "Fuel Type is required.")]
         public string FuelType { get; set; }
+        [Required(ErrorMessage = "Price per day is required.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Price per day must be greater than 0.")]
+        public decimal PricePerDay { get; set; }
     }
 }

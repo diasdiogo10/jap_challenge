@@ -7,6 +7,7 @@ using JAPChallenge.Data;
 using JAPChallenge.Dtos;
 using JAPChallenge.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace JAPChallenge.Controllers
@@ -46,7 +47,7 @@ namespace JAPChallenge.Controllers
             {
                 return Conflict(new { message = "The vehicle is already rented." });
             }
-            
+
             var CurrentDate = DateTime.Today;
 
             if (CurrentDate > contractAddDto.StartDate)
@@ -59,7 +60,10 @@ namespace JAPChallenge.Controllers
                 return Conflict(new { message = "The end date must be later than the start date." });
             }
 
+            var contractDays = (contract.EndDate - contract.StartDate).TotalDays;
+
             existingVehicle.Status = "Alugado";
+            contract.Total = existingVehicle.PricePerDay * (decimal)contractDays;
 
             _context.Vehicles.Update(existingVehicle);
             _context.Contracts.Add(contract);
@@ -69,5 +73,29 @@ namespace JAPChallenge.Controllers
 
             return Ok(contractResponse);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetContracts()
+        {
+            var contracts = await _context.Contracts.ToListAsync();
+            await _context.SaveChangesAsync();
+
+            var contractResponse = _mapper.Map<List<ContractResponseDto>>(contracts);
+
+            return Ok(contractResponse);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetContractById(int id)
+        {
+            var contract = await _context.Contracts.FindAsync(id);
+            await _context.SaveChangesAsync();
+
+            var contractResponse = _mapper.Map<ContractResponseDto>(contract);
+
+            return Ok(contractResponse);
+        }
     }
+    
+    
 }

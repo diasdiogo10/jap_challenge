@@ -1,9 +1,9 @@
-import ClientsTable from "@/components/tables/clients-table";
+import VehiclesGrid from "@/components/grids/vehicles-grid";
 
-export default function Home() {
+export default function Vehicles() {
   return (
     <>
-      <ClientsTable />
+      <VehiclesGrid />
     </>
   );
 }

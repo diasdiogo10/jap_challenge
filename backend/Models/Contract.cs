@@ -26,5 +26,6 @@ namespace JAPChallenge.Models
         [Required(ErrorMessage = "Vehicle is required.")]
         public int VehicleId { get; set; }
         public Vehicle Vehicle { get; set; }
+        public decimal Total { get; set; }
     }
 }

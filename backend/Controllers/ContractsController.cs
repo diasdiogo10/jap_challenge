@@ -60,12 +60,20 @@ namespace JAPChallenge.Controllers
                 return Conflict(new { message = "The end date must be later than the start date." });
             }
 
-            var contractDays = (contract.EndDate - contract.StartDate).TotalDays;
+            bool isOverlapping = await _context.Contracts.AnyAsync(c =>
+                c.VehicleId == contractAddDto.VehicleId &&
+                c.StartDate < contractAddDto.EndDate &&
+                c.EndDate > contractAddDto.StartDate
+            );
 
-            existingVehicle.Status = "Alugado";
+            if (isOverlapping)
+            {
+                return Conflict(new { message = "The vehicle is already rented in the selected period." });
+            }
+
+            var contractDays = (contract.EndDate - contract.StartDate).TotalDays;
             contract.Total = existingVehicle.PricePerDay * (decimal)contractDays;
 
-            _context.Vehicles.Update(existingVehicle);
             _context.Contracts.Add(contract);
             await _context.SaveChangesAsync();
 

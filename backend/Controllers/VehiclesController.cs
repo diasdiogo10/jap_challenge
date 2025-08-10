@@ -78,7 +78,16 @@ namespace JAPChallenge.Controllers
         [HttpGet]
         public async Task<IActionResult> GetVehicles()
         {
-            var vehicles = await _context.Vehicles.ToListAsync();
+            var today = DateTime.Today;
+
+            var vehicles = await _context.Vehicles.Include(v => v.Contracts).ToListAsync();
+
+            foreach (var vehicle in vehicles)
+            {
+                bool isRented = vehicle.Contracts.Any(c => c.StartDate <= today && c.EndDate >= today);
+                vehicle.Status = isRented ? "Alugado" : "Disponível";
+            }
+
             await _context.SaveChangesAsync();
 
             var vehicleResponse = _mapper.Map<List<VehicleResponseDto>>(vehicles);
@@ -86,10 +95,23 @@ namespace JAPChallenge.Controllers
             return Ok(vehicleResponse);
         }
 
-        [HttpGet("{id}")]
+
+
+       [HttpGet("{id}")]
         public async Task<IActionResult> GetVehicleById(int id)
         {
-            var vehicle = await _context.Vehicles.FindAsync(id);
+            var today = DateTime.Today;
+
+            var vehicle = await _context.Vehicles
+                .Include(v => v.Contracts)
+                .FirstOrDefaultAsync(v => v.Id == id);
+
+            if (vehicle == null)
+                return NotFound();
+
+            bool isRented = vehicle.Contracts.Any(c => c.StartDate <= today && c.EndDate >= today);
+            vehicle.Status = isRented ? "Alugado" : "Disponível";
+
             await _context.SaveChangesAsync();
 
             var vehicleResponse = _mapper.Map<VehicleResponseDto>(vehicle);
@@ -97,20 +119,23 @@ namespace JAPChallenge.Controllers
             return Ok(vehicleResponse);
         }
 
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateVehicle(int id, VehicleAddDto vehicleAddDto)
         {
             var vehicle = _mapper.Map<Vehicle>(vehicleAddDto);
-            var existingVehicle = _context.Vehicles.FirstOrDefault(vehicle => vehicle.Id == id);
+            var existingVehicle = await _context.Vehicles
+            .Include(v => v.Contracts)
+            .FirstOrDefaultAsync(v => v.Id == id);
 
             if (existingVehicle == null)
             {
                 return NotFound();
             }
 
-            var PlateNumberExists = await _context.Vehicles.AnyAsync(v => v.PlateNumber == vehicle.PlateNumber);
+            var plateNumberExists = await _context.Vehicles.AnyAsync(v => v.PlateNumber == vehicle.PlateNumber && v.Id != id);
 
-            if (PlateNumberExists)
+            if (plateNumberExists)
             {
                 return Conflict(new { message = "A vehicle with this plate number already exists." });
             }
@@ -127,7 +152,11 @@ namespace JAPChallenge.Controllers
             existingVehicle.PlateNumber = vehicle.PlateNumber;
             existingVehicle.ManufactureYear = vehicle.ManufactureYear;
             existingVehicle.FuelType = vehicle.FuelType;
-            existingVehicle.Status = "Disponível";
+
+            var today = DateTime.Today;
+            
+            bool isRented = existingVehicle.Contracts.Any(c => c.StartDate <= today && c.EndDate >= today);
+            existingVehicle.Status = isRented ? "Alugado" : "Disponível";
 
             await _context.SaveChangesAsync();
 

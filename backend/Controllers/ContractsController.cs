@@ -43,11 +43,6 @@ namespace JAPChallenge.Controllers
                 return NotFound();
             }
 
-            if (existingVehicle.Status == "Alugado")
-            {
-                return Conflict(new { message = "The vehicle is already rented." });
-            }
-
             var CurrentDate = DateTime.Today;
 
             if (CurrentDate > contractAddDto.StartDate)

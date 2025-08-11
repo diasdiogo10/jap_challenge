@@ -29,6 +29,7 @@ namespace JAPChallenge.Controllers
         public async Task<IActionResult> AddClient(ClientDto clientDto)
         {
             var client = _mapper.Map<Client>(clientDto);
+            
             var emailExists = await _context.Clients
                     .AnyAsync(c => c.Email == client.Email);
 

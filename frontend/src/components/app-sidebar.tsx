@@ -1,4 +1,4 @@
-import { Handshake, Home, User } from "lucide-react";
+import { Car, Handshake, Home, User } from "lucide-react";
 
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 
@@ -12,6 +12,11 @@ const items = [
 		title: "Clients",
 		url: "/clients",
 		icon: User,
+	},
+	{
+		title: "Vehicles",
+		url: "/vehicles",
+		icon: Car,
 	},
 	{
 		title: "Contracts",

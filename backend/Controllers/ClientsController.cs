@@ -54,6 +54,13 @@ namespace JAPChallenge.Controllers
                 return NotFound();
             }
 
+            var contractsExists = _context.Contracts.Any(contract => contract.ClientId == id);
+
+            if (contractsExists)
+            {
+                return Conflict(new { message = "There are active contracts for this client and they cannot be deleted." });
+            }
+
             _context.Clients.Remove(existingClient);
             await _context.SaveChangesAsync();
 
@@ -99,6 +106,13 @@ namespace JAPChallenge.Controllers
             if (emailExists)
             {
                 return Conflict(new { message = "A client with this email already exists." });
+            }
+
+            var contractsExists = _context.Contracts.Any(contract => contract.ClientId == id);
+
+            if (contractsExists)
+            {
+                return Conflict(new { message = "There are active contracts for this client and they cannot be deleted." });
             }
 
             existingClient.FullName = client.FullName;

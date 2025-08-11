@@ -67,6 +67,15 @@ namespace JAPChallenge.Controllers
                 return Conflict(new { message = "The vehicle is currently rented and cannot be deleted." });
             }
 
+            var today = DateTime.Today;
+
+            var contractsExists = _context.Contracts.Any(contract => contract.VehicleId == id && contract.EndDate >= today);
+
+            if (contractsExists)
+            {
+                return Conflict(new { message = "Vehicle has active contracts and cannot be deleted." });
+            }
+
             _context.Vehicles.Remove(existingVehicle);
             await _context.SaveChangesAsync();
 
@@ -80,7 +89,7 @@ namespace JAPChallenge.Controllers
         {
             var today = DateTime.Today;
 
-            var vehicles = await _context.Vehicles.Include(v => v.Contracts).ToListAsync();
+            var vehicles = await _context.Vehicles.ToListAsync();
 
             foreach (var vehicle in vehicles)
             {
@@ -102,9 +111,7 @@ namespace JAPChallenge.Controllers
         {
             var today = DateTime.Today;
 
-            var vehicle = await _context.Vehicles
-                .Include(v => v.Contracts)
-                .FirstOrDefaultAsync(v => v.Id == id);
+            var vehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.Id == id);
 
             if (vehicle == null)
                 return NotFound();
@@ -124,9 +131,7 @@ namespace JAPChallenge.Controllers
         public async Task<IActionResult> UpdateVehicle(int id, VehicleAddDto vehicleAddDto)
         {
             var vehicle = _mapper.Map<Vehicle>(vehicleAddDto);
-            var existingVehicle = await _context.Vehicles
-            .Include(v => v.Contracts)
-            .FirstOrDefaultAsync(v => v.Id == id);
+            var existingVehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.Id == id);
 
             if (existingVehicle == null)
             {
@@ -140,11 +145,18 @@ namespace JAPChallenge.Controllers
                 return Conflict(new { message = "A vehicle with this plate number already exists." });
             }
 
-            int CurrentYear = DateTime.Now.Year;
+            var CurrentDate = DateTime.Today;
 
-            if (CurrentYear < vehicle.ManufactureYear)
+            if (CurrentDate.Year < vehicle.ManufactureYear)
             {
                 return Conflict(new { message = "The manufacture year cannot be in the future." });
+            }
+
+            var contractsExists = _context.Contracts.Any(contract => contract.VehicleId == id && contract.EndDate >= CurrentDate);
+
+            if (contractsExists)
+            {
+                return Conflict(new { message = "Vehicle has active contracts and cannot be deleted." });
             }
 
             existingVehicle.Brand = vehicle.Brand;

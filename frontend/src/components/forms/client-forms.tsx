@@ -17,7 +17,7 @@ const FormSchema = z.object({
 	fullName: z.string().nonempty("Client full name is required"),
 	email: z.string().nonempty("Client email is required"),
 	phone: z.string().nonempty("Client phone is required"),
-	drivingLicense: z.string().nonempty("Client divring license is required"),
+	drivingLicense: z.string().nonempty("Client driving license is required"),
 });
 
 export function NewClientForm() {

@@ -58,7 +58,7 @@ export default function ClientsTable() {
 				<TableCaption className="sr-only">Clients List</TableCaption>
 				<TableHeader>
 					<TableRow>
-						<TableHead className="w-[25%]">Name</TableHead>
+						<TableHead className="w-[25%]">Full Name</TableHead>
 						<TableHead className="w-[25%]">Email</TableHead>
 						<TableHead className="w-[25%]">Phone</TableHead>
 						<TableHead>Driving License</TableHead>

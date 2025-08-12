@@ -41,20 +41,24 @@ namespace JAPChallenge.Controllers
             _context.Clients.Add(client);
             await _context.SaveChangesAsync();
 
-            return Ok(client);
+            var clientResponse = _mapper.Map<ClientDto>(client);
+
+            return Ok(clientResponse);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteClient(int id)
         {
-            var existingClient = _context.Clients.FirstOrDefault(client => client.Id == id);
+            var existingClient = await _context.Clients
+                .FirstOrDefaultAsync(client => client.Id == id);
 
             if (existingClient == null)
             {
-                return NotFound();
+                return NotFound("Client not found.");
             }
 
-            var contractsExists = _context.Contracts.Any(contract => contract.ClientId == id);
+            var contractsExists = await _context.Contracts
+                .AnyAsync(contract => contract.ClientId == id);
 
             if (contractsExists)
             {
@@ -64,18 +68,20 @@ namespace JAPChallenge.Controllers
             _context.Clients.Remove(existingClient);
             await _context.SaveChangesAsync();
 
-            var clientDto = _mapper.Map<ClientDto>(existingClient);
-            return Ok(clientDto);
+            var clientResponse = _mapper.Map<ClientDto>(existingClient);
+
+            return Ok(clientResponse);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetClients()
         {
             var clients = await _context.Clients.ToListAsync();
 
-            var clientDtos = _mapper.Map<List<ClientDto>>(clients);
+            var clientResponse = _mapper.Map<List<ClientDto>>(clients);
 
-            return Ok(clientDtos);
+            return Ok(clientResponse);
         }
 
         [HttpGet("{id}")]
@@ -84,20 +90,20 @@ namespace JAPChallenge.Controllers
             var client = await _context.Clients.FindAsync(id);
             await _context.SaveChangesAsync();
 
-            var clientDto = _mapper.Map<ClientDto>(client);
+            var clientResponse = _mapper.Map<ClientDto>(client);
 
-            return Ok(clientDto);
+            return Ok(clientResponse);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateClient(int id, ClientDto clientDto)
         {
             var client = _mapper.Map<Client>(clientDto);
-            var existingClient = _context.Clients.FirstOrDefault(client => client.Id == id);
+            var existingClient = await _context.Clients.FirstOrDefaultAsync(client => client.Id == id);
 
             if (existingClient == null)
             {
-                return NotFound();
+                return NotFound("Client not found.");
             }
 
             var emailExists = await _context.Clients
@@ -108,11 +114,11 @@ namespace JAPChallenge.Controllers
                 return Conflict(new { message = "A client with this email already exists." });
             }
 
-            var contractsExists = _context.Contracts.Any(contract => contract.ClientId == id);
+            var contractsExists = await _context.Contracts.AnyAsync(contract => contract.ClientId == id);
 
             if (contractsExists)
             {
-                return Conflict(new { message = "There are active contracts for this client and they cannot be deleted." });
+                return Conflict(new { message = "There are active contracts for this client and they cannot be updated." });
             }
 
             existingClient.FullName = client.FullName;

@@ -59,7 +59,7 @@ namespace JAPChallenge.Controllers
 
             if (existingVehicle == null)
             {
-                return NotFound();
+                return NotFound("Vehicle not found.");
             }
 
             if (existingVehicle.Status == "Alugado")
@@ -114,7 +114,9 @@ namespace JAPChallenge.Controllers
             var vehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.Id == id);
 
             if (vehicle == null)
-                return NotFound();
+            {
+                return NotFound("Vehicle not found.");
+            }
 
             bool isRented = vehicle.Contracts.Any(c => c.StartDate <= today && c.EndDate >= today);
             vehicle.Status = isRented ? "Alugado" : "Disponível";
@@ -135,7 +137,7 @@ namespace JAPChallenge.Controllers
 
             if (existingVehicle == null)
             {
-                return NotFound();
+                return NotFound("Vehicle not found.");
             }
 
             var plateNumberExists = await _context.Vehicles.AnyAsync(v => v.PlateNumber == vehicle.PlateNumber && v.Id != id);

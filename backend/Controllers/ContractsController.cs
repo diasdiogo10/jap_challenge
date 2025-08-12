@@ -26,34 +26,29 @@ namespace JAPChallenge.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> addContract(ContractAddDto contractAddDto)
+        public async Task<IActionResult> AddContract(ContractAddDto contractAddDto)
         {
             var contract = _mapper.Map<Contract>(contractAddDto);
-            var existingClient = _context.Clients.FirstOrDefault(client => client.Id == contractAddDto.ClientId);
+
+            var existingClient = await _context.Clients
+                .FirstOrDefaultAsync(client => client.Id == contractAddDto.ClientId);
 
             if (existingClient == null)
-            {
-                return NotFound();
-            }
+                return NotFound(new { message = "Client not found." });
 
-            var existingVehicle = _context.Vehicles.FirstOrDefault(vehicle => vehicle.Id == contractAddDto.VehicleId);
+            var existingVehicle = await _context.Vehicles
+                .FirstOrDefaultAsync(vehicle => vehicle.Id == contractAddDto.VehicleId);
 
             if (existingVehicle == null)
-            {
-                return NotFound();
-            }
+                return NotFound(new { message = "Vehicle not found." });
 
-            var CurrentDate = DateTime.Today;
+            var currentDate = DateTime.Today;
 
-            if (CurrentDate > contractAddDto.StartDate)
-            {
+            if (currentDate > contractAddDto.StartDate)
                 return Conflict(new { message = "The start date must be later than or equal to today's date." });
-            }
 
             if (contractAddDto.StartDate >= contractAddDto.EndDate)
-            {
                 return Conflict(new { message = "The end date must be later than the start date." });
-            }
 
             bool isOverlapping = await _context.Contracts.AnyAsync(c =>
                 c.VehicleId == contractAddDto.VehicleId &&
@@ -62,9 +57,7 @@ namespace JAPChallenge.Controllers
             );
 
             if (isOverlapping)
-            {
                 return Conflict(new { message = "The vehicle is already rented in the selected period." });
-            }
 
             var contractDays = (contract.EndDate - contract.StartDate).TotalDays;
             contract.Total = existingVehicle.PricePerDay * (decimal)contractDays;
@@ -73,9 +66,9 @@ namespace JAPChallenge.Controllers
             await _context.SaveChangesAsync();
 
             var contractResponse = _mapper.Map<ContractResponseDto>(contract);
-
             return Ok(contractResponse);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetContracts()
@@ -99,6 +92,4 @@ namespace JAPChallenge.Controllers
             return Ok(contractResponse);
         }
     }
-    
-    
 }

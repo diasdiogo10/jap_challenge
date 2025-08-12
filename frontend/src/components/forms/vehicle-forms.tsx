@@ -323,7 +323,7 @@ export function EditVehicleForm({ vehicleId }: { vehicleId: string }) {
 						)}
 					/>
 				</div>
-				<Button type="submit">Add Vehicle</Button>
+				<Button type="submit">Update vehicle</Button>
 			</form>
 		</Form>
 	);

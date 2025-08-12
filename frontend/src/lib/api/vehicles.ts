@@ -9,7 +9,10 @@ export async function getVehicles() {
 			},
 		});
 
-		if (!res.ok) throw new Error(res.statusText);
+		if (!res.ok) {
+			const errorData = await res.json().catch(() => ({}));
+			throw new Error(errorData.message || res.statusText);
+		}
 
 		return await res.json();
 	} catch (err: any) {
@@ -26,7 +29,10 @@ export async function getVehicle(id: any) {
 			},
 		});
 
-		if (!res.ok) throw new Error(res.statusText);
+		if (!res.ok) {
+			const errorData = await res.json().catch(() => ({}));
+			throw new Error(errorData.message || res.statusText);
+		}
 
 		return await res.json();
 	} catch (err: any) {
@@ -44,9 +50,10 @@ export async function postVehicle(client: any) {
 			body: JSON.stringify(client),
 		});
 
-		if (!res.ok) throw new Error(res.statusText);
-
-		console.log(res.text());
+		if (!res.ok) {
+			const errorData = await res.json().catch(() => ({}));
+			throw new Error(errorData.message || res.statusText);
+		}
 
 		return await res.json();
 	} catch (err: any) {
@@ -64,7 +71,10 @@ export async function putVehicle(id: any, client: any) {
 			body: JSON.stringify(client),
 		});
 
-		if (!res.ok) throw new Error(res.statusText);
+		if (!res.ok) {
+			const errorData = await res.json().catch(() => ({}));
+			throw new Error(errorData.message || res.statusText);
+		}
 
 		return await res.json();
 	} catch (err: any) {
@@ -81,7 +91,10 @@ export async function deleteVehicle(id: any) {
 			},
 		});
 
-		if (!res.ok) throw new Error(res.statusText);
+		if (!res.ok) {
+			const errorData = await res.json().catch(() => ({}));
+			throw new Error(errorData.message || res.statusText);
+		}
 
 		return await res.json();
 	} catch (err: any) {

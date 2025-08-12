@@ -79,11 +79,11 @@ export default function ContractsGrid() {
 					filteredContracts.map((contract, idx) => (
 						<Card key={contract.id} className={idx % 2 === 0 ? "bg-muted/40 hover:bg-muted" : "bg-muted/0 hover:bg-muted"}>
 							<CardHeader>
-								<CardTitle>{`${contract.startDate} ${contract.endDate}`}</CardTitle>
-								<CardDescription>{contract.initialMileage}</CardDescription>
+								{`${String(contract.startDate).split("T")[0]} - ${String(contract.endDate).split("T")[0]}`}
+								<CardDescription>{contract.initialMileage} km</CardDescription>
 							</CardHeader>
 							<CardContent className="text-sm">
-								<p>Total: {contract.total}</p>
+								<p>Total: {contract.total}€</p>
 							</CardContent>
 							<CardFooter>
 								<Button className="w-full" onClick={() => router.push(`/contracts/${contract.id}`)}>

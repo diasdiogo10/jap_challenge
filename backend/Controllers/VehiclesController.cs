@@ -28,7 +28,9 @@ namespace JAPChallenge.Controllers
         public async Task<IActionResult> AddVehicle(VehicleAddDto vehicleAddDto)
         {
             var vehicle = _mapper.Map<Vehicle>(vehicleAddDto);
-            var PlateNumberExists = await _context.Vehicles.AnyAsync(v => v.PlateNumber == vehicle.PlateNumber);
+            
+            var PlateNumberExists = await _context.Vehicles
+                .AnyAsync(v => v.PlateNumber == vehicle.PlateNumber);
 
             if (PlateNumberExists)
             {
@@ -55,7 +57,8 @@ namespace JAPChallenge.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVehicle(int id)
         {
-            var existingVehicle = _context.Vehicles.FirstOrDefault(vehicle => vehicle.Id == id);
+            var existingVehicle = await _context.Vehicles
+                .FirstOrDefaultAsync(vehicle => vehicle.Id == id);
 
             if (existingVehicle == null)
             {
@@ -69,7 +72,7 @@ namespace JAPChallenge.Controllers
 
             var today = DateTime.Today;
 
-            var contractsExists = _context.Contracts.Any(contract => contract.VehicleId == id && contract.EndDate >= today);
+            var contractsExists = await _context.Contracts.AnyAsync(contract => contract.VehicleId == id && contract.EndDate >= today);
 
             if (contractsExists)
             {
@@ -89,7 +92,9 @@ namespace JAPChallenge.Controllers
         {
             var today = DateTime.Today;
 
-            var vehicles = await _context.Vehicles.ToListAsync();
+            var vehicles = await _context.Vehicles
+                .Include(v => v.Contracts)
+                .ToListAsync();
 
             foreach (var vehicle in vehicles)
             {
@@ -104,8 +109,6 @@ namespace JAPChallenge.Controllers
             return Ok(vehicleResponse);
         }
 
-
-
        [HttpGet("{id}")]
         public async Task<IActionResult> GetVehicleById(int id)
         {
@@ -117,9 +120,6 @@ namespace JAPChallenge.Controllers
             {
                 return NotFound("Vehicle not found.");
             }
-
-            bool isRented = vehicle.Contracts.Any(c => c.StartDate <= today && c.EndDate >= today);
-            vehicle.Status = isRented ? "Alugado" : "Disponível";
 
             await _context.SaveChangesAsync();
 
@@ -133,7 +133,9 @@ namespace JAPChallenge.Controllers
         public async Task<IActionResult> UpdateVehicle(int id, VehicleAddDto vehicleAddDto)
         {
             var vehicle = _mapper.Map<Vehicle>(vehicleAddDto);
-            var existingVehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.Id == id);
+            var existingVehicle = await _context.Vehicles
+                .Include(v => v.Contracts)
+                .FirstOrDefaultAsync(v => v.Id == id);
 
             if (existingVehicle == null)
             {
@@ -154,11 +156,15 @@ namespace JAPChallenge.Controllers
                 return Conflict(new { message = "The manufacture year cannot be in the future." });
             }
 
-            var contractsExists = _context.Contracts.Any(contract => contract.VehicleId == id && contract.EndDate >= CurrentDate);
+            var contractsExists = await _context.Contracts.AnyAsync(contract =>
+                contract.VehicleId == id &&
+                contract.StartDate <= CurrentDate &&
+                contract.EndDate >= CurrentDate
+            );
 
             if (contractsExists)
             {
-                return Conflict(new { message = "Vehicle has active contracts and cannot be deleted." });
+                return Conflict(new { message = "Vehicle has active contracts and cannot be updated." });
             }
 
             existingVehicle.Brand = vehicle.Brand;
@@ -166,11 +172,6 @@ namespace JAPChallenge.Controllers
             existingVehicle.PlateNumber = vehicle.PlateNumber;
             existingVehicle.ManufactureYear = vehicle.ManufactureYear;
             existingVehicle.FuelType = vehicle.FuelType;
-
-            var today = DateTime.Today;
-            
-            bool isRented = existingVehicle.Contracts.Any(c => c.StartDate <= today && c.EndDate >= today);
-            existingVehicle.Status = isRented ? "Alugado" : "Disponível";
 
             await _context.SaveChangesAsync();
 

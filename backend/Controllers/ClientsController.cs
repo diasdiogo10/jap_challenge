@@ -31,7 +31,7 @@ namespace JAPChallenge.Controllers
             var client = _mapper.Map<Client>(clientDto);
             
             var emailExists = await _context.Clients
-                    .AnyAsync(c => c.Email == client.Email);
+                .AnyAsync(c => c.Email == client.Email);
 
             if (emailExists)
             {
@@ -107,18 +107,11 @@ namespace JAPChallenge.Controllers
             }
 
             var emailExists = await _context.Clients
-                .AnyAsync(c => c.Email == client.Email);
+                .AnyAsync(c => c.Email == client.Email && c.Id != id);
 
             if (emailExists)
             {
                 return Conflict(new { message = "A client with this email already exists." });
-            }
-
-            var contractsExists = await _context.Contracts.AnyAsync(contract => contract.ClientId == id);
-
-            if (contractsExists)
-            {
-                return Conflict(new { message = "There are active contracts for this client and they cannot be updated." });
             }
 
             existingClient.FullName = client.FullName;

@@ -29,7 +29,7 @@
 
 ### 4 **Configuração do ".env" - Frontend**
 
-#### Crie um ficheiro ".env" na pasta "backend" com a seguinte variável:
+#### Crie um ficheiro ".env" na pasta "frontend" com a seguinte variável:
 
     NEXT_PUBLIC_API_BASE_URL = "http://localhost:5003"
 

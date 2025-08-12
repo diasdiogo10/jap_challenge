@@ -16,24 +16,24 @@
 
 -   **https://github.com/diasdiogo10/jap_challenge.git**
 
-### **Configuração do ".env" - Backend**
+### 2 **Configuração do ".env" - Backend**
 
 #### Crie um ficheiro ".env" na pasta "backend" com a seguinte variável:
 
     DefaultConnection="Server=tcp:japchallengeserver.database.windows.net,1433;Initial Catalog=JAPChallengeDB;Persist Security Info=False;User ID=adminchallenge;Password=JAPchallenge0608;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
 
-### 2 **Executar o Backend**
+### 3 **Executar o Backend**
 
 -   **cd backend:**
 -   **dotnet run**
 
-### **Configuração do ".env" - Frontend**
+### 4 **Configuração do ".env" - Frontend**
 
 #### Crie um ficheiro ".env" na pasta "backend" com a seguinte variável:
 
     NEXT_PUBLIC_API_BASE_URL = "http://localhost:5003"
 
-### 2 **Executar o Frontend**
+### 5 **Executar o Frontend**
 
 -   **cd frontend**
 -   **npm install**
